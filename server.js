@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 
 const mongoose = require('mongoose')
+mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGO_URI)
 
 app.use(cors())
@@ -27,6 +28,13 @@ const usersSchema = new Schema({
 })
 let Users = mongoose.model("Users", usersSchema); 
 
+app.route("/api/exercise/new-user").post((req, res) => {
+  let newUser = new Users({user_name: req.body.username})
+  newUser.save((err, data) => {
+    if(err) res.send("there is error");
+    res.json(data);
+  })
+})
 // Not found middleware
 app.use((req, res, next) => {
   return next({status: 404, message: 'not found'})
@@ -51,10 +59,7 @@ app.use((err, req, res, next) => {
     .send(errMessage)
 })
 
-app.route("/api/exercise/new-user").post((req, res) => {
-  let newUser = new Users({user_name: req.body.username})
-  new
-})
+
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
