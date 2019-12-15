@@ -18,6 +18,14 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
+const Schema = mongoose.Schema;
+const usersSchema = new Schema({
+  user_name: {
+    type: String,
+    requiered: true
+  }
+})
+let Users = mongoose.model("Users", usersSchema); 
 
 // Not found middleware
 app.use((req, res, next) => {
@@ -41,6 +49,11 @@ app.use((err, req, res, next) => {
   }
   res.status(errCode).type('txt')
     .send(errMessage)
+})
+
+app.route("/api/exercise/new-user").post((req, res) => {
+  let newUser = new Users({user_name: req.body.username})
+  new
 })
 
 const listener = app.listen(process.env.PORT || 3000, () => {
