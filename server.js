@@ -28,7 +28,7 @@ const usersSchema = new Schema({
     type: String,
     requiered: true
   }
-})
+}, {versionKey: false});
 let Users = mongoose.model("Users", usersSchema); 
 
 app.route("/api/exercise/new-user").post((req, res) => {
