@@ -34,9 +34,15 @@ const usersSchema = new Schema({
 }, {versionKey: false});
 
 const exerciseSchema = new Schema({
-  
+  user_name: {
+    type: String,
+    required: true
+  },
+  count: Number,
+  log: [Object]
 })
 let Users = mongoose.model("Users", usersSchema); 
+let Exercises = mongoose.model("Exercises", exerciseSchema);
 
 app.route("/api/exercise/new-user").post((req, res) => {
   let newUser = new Users({user_name: req.body.username})
@@ -49,9 +55,16 @@ app.route("/api/exercise/new-user").post((req, res) => {
 app.route("/api/exercise/add").post((req, res) => {
   Users.findById(req.body.userId, (err, data) => {
     if (err) res.json({error: err});
-    data.description = req.body.description;
-    data.duration = req.body.duration;
-    data.date = req.body.date ? new Date().toDateString(req.body.daten): new Date().toDateString();
+    let newExcersise = new Exercises({
+      id: req.body.userId,
+      user_name: data.user_name,
+      count: this.count++,
+      log: [{
+        description: req.body.description,
+        duration: req.body.duration,
+        date: req.body.date ? new Date().toDateString(req.body.daten): new Date().toDateString()
+      }]
+    })
     res.json(data);
   })
 })
