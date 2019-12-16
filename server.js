@@ -27,7 +27,10 @@ const usersSchema = new Schema({
   user_name: {
     type: String,
     requiered: true
-  }
+  },
+  description: String,
+  duration: String,
+  date: String
 }, {versionKey: false});
 let Users = mongoose.model("Users", usersSchema); 
 
@@ -36,6 +39,14 @@ app.route("/api/exercise/new-user").post((req, res) => {
   newUser.save((err, data) => {
     if(err) res.send("there is error");
     res.json(data);
+  })
+})
+
+app.route("/api/exercise/add").post((req, res) => {
+  Users.findById(req.params.userId, (err, data) => {
+    data.description = req.params.description;
+    data.duration = req.params.duration;
+    data.date = req.params.date;
   })
 })
 // Not found middleware
