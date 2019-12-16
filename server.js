@@ -55,17 +55,24 @@ app.route("/api/exercise/new-user").post((req, res) => {
 app.route("/api/exercise/add").post((req, res) => {
   Users.findById(req.body.userId, (err, data) => {
     if (err) res.json({error: err});
-    let newExcersise = new Exercises({
+    let newExercise = new Exercises({
       id: req.body.userId,
       user_name: data.user_name,
       count: this.count++,
       log: [{
         description: req.body.description,
         duration: req.body.duration,
-        date: req.body.date ? new Date().toDateString(req.body.daten): new Date().toDateString()
+        date: req.body.date ? new Date().toDateString(req.body.date): new Date().toDateString()
       }]
     })
-    res.json(data);
+    newExercise.save(()=>{});
+    res.json({
+      id: req.body.userId,
+      user_name: data.user_name,
+      description: req.body.description,
+      duration: req.body.duration,
+      date: req.body.date ? new Date().toDateString(req.body.date): new Date().toDateString()
+    });
   })
 })
 
@@ -76,6 +83,7 @@ app.route("/api/exercise/users").get((req, res) => {
   })  
 })
 
+app.get("/api/exercise/log?userId=<userId>")
 // Not found middleware
 app.use((req, res, next) => {
   return next({status: 404, message: 'not found'})
