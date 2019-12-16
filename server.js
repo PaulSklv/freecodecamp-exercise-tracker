@@ -44,12 +44,15 @@ const exerciseSchema = new Schema({
 let Users = mongoose.model("Users", usersSchema); 
 let Exercises = mongoose.model("Exercises", exerciseSchema);
 
-app.route("/api/exercise/new-user").post((req, res) => {
+app.route("/api/exercise/new-user").post((req, res, next) => {
   let newUser = new Users({user_name: req.body.username})
   newUser.save((err, data) => {
     if(err) res.send("there is error");
     res.json(data);
   })
+  next();
+}, (req, res) => {
+  let newExercise = new Exercises({})
 })
 
 app.route("/api/exercise/add").post((req, res) => {
@@ -67,13 +70,13 @@ app.route("/api/exercise/add").post((req, res) => {
     newExercise.save((err, data)=>{
       if(err) res.json({error: err})
     });
-    res.json({
-      _id: data._id,
-      user_name: data.user_name,
-      description: req.body.description,
-      duration: req.body.duration,
-      date: req.body.date ? new Date().toDateString(req.body.date): new Date().toDateString()
-    });
+    // res.json({
+    //   _id: data._id,
+    //   user_name: data.user_name,
+    //   description: req.body.description,
+    //   duration: req.body.duration,
+    //   date: req.body.date ? new Date().toDateString(req.body.date): new Date().toDateString()
+    // });
   })
 })
 
