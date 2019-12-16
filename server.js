@@ -29,9 +29,13 @@ const usersSchema = new Schema({
     requiered: true
   },
   description: String,
-  duration: String,
+  duration: Number,
   date: String
 }, {versionKey: false});
+
+const exerciseSchema = new Schema({
+  
+})
 let Users = mongoose.model("Users", usersSchema); 
 
 app.route("/api/exercise/new-user").post((req, res) => {
@@ -47,7 +51,7 @@ app.route("/api/exercise/add").post((req, res) => {
     if (err) res.json({error: err});
     data.description = req.body.description;
     data.duration = req.body.duration;
-    data.date = req.body.date ? req.body.date : new Date().toUTCString();
+    data.date = req.body.date ? new Date().toDateString(req.body.daten): new Date().toDateString();
     res.json(data);
   })
 })
