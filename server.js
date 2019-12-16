@@ -53,13 +53,14 @@ app.route("/api/exercise/new-user").post((req, res, next) => {
 })
 
 app.route("/api/exercise/add").post((req, res) => {
-  Users.findById(req.body.userId, (err, data) => {
+  Users.findById(req.body.userId, (err, user) => {
     if (err) res.json({error: err});
-    Exercises.findById(req.body.userId, (err, data) => {
-      if(!data) {
+    Exercises.findById(req.body.userId, (err, exercise) => {
+
+      if(!exercise) {
         let newExercise = new Exercises({
-          _id: data._id,
-          user_name: data.user_name,
+          _id: user._id,
+          user_name: user.user_name,
           count: 1,
           log: [{
             description: req.body.description,
@@ -68,15 +69,20 @@ app.route("/api/exercise/add").post((req, res) => {
           }]
         })
         newExercise.save((err, data) => {
-          if(err) res.json({error: err})
+          if(err) res.json({error: err});
+          res.send(data);
         })
       } else {
-        data.count = data.count.length + 1;
-        data.log = [...data.log, {
+        exercise.count = exercise.log.length + 1;
+        exercise.log = [...exercise.log, {
           description: req.body.description,
           duration: req.body.duration,
           date: req.body.date ? new Date().toDateString(req.body.date): new Date().toDateString()
         }]
+        exercise.save((err, data) => {
+          if(err) res.json({error: err});
+          res.send(data);
+        })
       }
     }) 
   })
