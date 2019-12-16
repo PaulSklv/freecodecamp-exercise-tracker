@@ -43,12 +43,22 @@ app.route("/api/exercise/new-user").post((req, res) => {
 })
 
 app.route("/api/exercise/add").post((req, res) => {
-  Users.findById(req.params.userId, (err, data) => {
-    data.description = req.params.description;
-    data.duration = req.params.duration;
-    data.date = req.params.date;
+  Users.findById(req.body.userId, (err, data) => {
+    if (err) res.json({error: err});
+    data.description = req.body.description;
+    data.duration = req.body.duration;
+    data.date = req.body.date ? req.body.date : new Date().toUTCString();
+    res.json(data);
   })
 })
+
+app.route("/api/exercise/users").get((req, res) => {
+  Users.find({}, (err, data) => {
+    if(err) res.json({error: err})
+    res.send(data);
+  })  
+})
+
 // Not found middleware
 app.use((req, res, next) => {
   return next({status: 404, message: 'not found'})
