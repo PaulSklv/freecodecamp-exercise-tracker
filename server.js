@@ -56,25 +56,24 @@ app.route("/api/exercise/add").post((req, res) => {
   Users.findById(req.body.userId, (err, data) => {
     if (err) res.json({error: err});
     let newExercise = new Exercises({
-      user_name: data.user_name
-      // log: [{
-      //   description: req.body.description,
-      //   duration: req.body.duration,
-      //   date: req.body.date ? new Date().toDateString(req.body.date): new Date().toDateString()
-      // }]
+      _id: data._id,
+      user_name: data.user_name,
+      log: [{
+        description: req.body.description,
+        duration: req.body.duration,
+        date: req.body.date ? new Date().toDateString(req.body.date): new Date().toDateString()
+      }]
     })
     newExercise.save((err, data)=>{
       if(err) res.json({error: err})
-      res.data(data);
     });
-
-    // res.json({
-    //   _id: req.body.userId,
-    //   user_name: data.user_name,
-    //   description: req.body.description,
-    //   duration: req.body.duration,
-    //   date: req.body.date ? new Date().toDateString(req.body.date): new Date().toDateString()
-    // });
+    res.json({
+      _id: data._id,
+      user_name: data.user_name,
+      description: req.body.description,
+      duration: req.body.duration,
+      date: req.body.date ? new Date().toDateString(req.body.date): new Date().toDateString()
+    });
   })
 })
 
