@@ -56,23 +56,25 @@ app.route("/api/exercise/add").post((req, res) => {
   Users.findById(req.body.userId, (err, data) => {
     if (err) res.json({error: err});
     let newExercise = new Exercises({
-      id: req.body.userId,
+      _id: data._id,
       user_name: data.user_name,
-      count: this.count++,
       log: [{
         description: req.body.description,
         duration: req.body.duration,
         date: req.body.date ? new Date().toDateString(req.body.date): new Date().toDateString()
       }]
     })
-    newExercise.save(()=>{});
-    res.json({
-      id: req.body.userId,
-      user_name: data.user_name,
-      description: req.body.description,
-      duration: req.body.duration,
-      date: req.body.date ? new Date().toDateString(req.body.date): new Date().toDateString()
+    newExercise.save((err, data)=>{
+      if(err) res.json({error: err})
+      res.data(data);
     });
+    // res.json({
+    //   _id: req.body.userId,
+    //   user_name: data.user_name,
+    //   description: req.body.description,
+    //   duration: req.body.duration,
+    //   date: req.body.date ? new Date().toDateString(req.body.date): new Date().toDateString()
+    // });
   })
 })
 
@@ -83,7 +85,12 @@ app.route("/api/exercise/users").get((req, res) => {
   })  
 })
 
-app.get("/api/exercise/log?userId=<userId>")
+app.get("/api/exercise/log", (req, res) => {
+  Exercises.find({user_name: "userssss"}, (err, data) => {
+    if(err) res.json({error: err});
+    res.send(data);
+  })
+})
 // Not found middleware
 app.use((req, res, next) => {
   return next({status: 404, message: 'not found'})
