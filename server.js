@@ -78,8 +78,8 @@ app.route("/api/exercise/add").post((req, res) => {
       });
       newExercise.save((err, data) => {
         if (err) res.json({ error: err });
-        const { _id, ...b } = data;
-        res.send(b);
+
+        res.send(data);
       });
     } else res.send("User doesn't exist in database.");
   });
