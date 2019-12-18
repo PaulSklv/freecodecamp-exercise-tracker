@@ -63,6 +63,7 @@ app.route("/api/exercise/new-user").post((req, res, next) => {
 
 app.route("/api/exercise/add").post((req, res) => {
   Users.findById(req.body.userId, (err, user) => {
+    if(err) res.json({error: err});
     if(user) {
       let newExercise = new Exercises({
         user_info: user,
@@ -70,7 +71,11 @@ app.route("/api/exercise/add").post((req, res) => {
         duration: req.body.duration,
         date: req.body.date ? new Date().toDateString(req.body.date): new Date().toDateString()
       })
-    } else 
+      newExercise.save((err, data) => {
+        if(err) res.json({error: err});
+        res.send(data);
+      })
+    } else res.send("User doesn't exist in database.");
   })
 })
 
@@ -118,7 +123,7 @@ app.route("/api/exercise/users").get((req, res) => {
 })
 
 app.get("/api/exercise/log", (req, res) => {
-  Exercises.find({user_name: "userssss"}, (err, data) => {
+  Exercises.find({user_info: {_id: req.query.userId}}, (err, data) => {
     if(err) res.json({error: err});
     res.send(data);
   })
