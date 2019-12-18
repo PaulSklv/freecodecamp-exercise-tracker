@@ -49,7 +49,7 @@ const exerciseSchema = new Schema({
   id: String,
   description: String,
   duration: Number,
-  date: String
+  date: Object
 });
 
 let Users = mongoose.model("Users", usersSchema);
@@ -73,8 +73,8 @@ app.route("/api/exercise/add").post((req, res) => {
         description: req.body.description,
         duration: req.body.duration,
         date: req.body.date
-          ? new Date().toDateString(req.body.date)
-          : new Date().toDateString()
+          ? new Date(req.body.date)
+          : new Date()
       });
       newExercise.save((err, data) => {
         if (err) res.json({ error: err });
@@ -131,11 +131,14 @@ app.route("/api/exercise/users").get((req, res) => {
 app.get("/api/exercise/log", (req, res) => {
   Exercises.find({ id: req.query.userId }, (err, data) => {
     if (err) res.json({ error: err });
-    res.send(
-      data.map(item => {
-        
-      })
-    );
+    res.json({
+      user_name: data[0].user_name,
+      id: data[0].id,
+      count: data.length,
+      log: data.map(item => {
+            return  {description: item.description, duration: item.duration, date: item.date};
+        })
+    });
   });
 });
 // Not found middleware
