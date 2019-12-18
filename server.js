@@ -129,11 +129,15 @@ app.route("/api/exercise/users").get((req, res) => {
 app.get("/api/exercise/log", (req, res) => {
   Exercises.find({
     id: req.query.userId,
-    date: { $gte: new Date(req.query.from), $lte: new Date(req.query.to) }
+    date: { $gt: new Date(req.query.from), $lt: new Date(req.query.to) }
   })
     .limit(req.query.limit)
-    .exec((err, data) => {
-      if (!req.query.userId) res.json({ error: err });
+    .exec((err, data, next) => {
+      if (!req.query.userId) {
+        const err = new Error("Required qery param 'userId' is missing.");
+        err.status = 400;
+        res.send(err);
+      }
       res.json({
         user_name: data[0].user_name,
         id: data[0].id,
