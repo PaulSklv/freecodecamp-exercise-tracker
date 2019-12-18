@@ -131,7 +131,11 @@ app.route("/api/exercise/users").get((req, res) => {
 app.get("/api/exercise/log", (req, res) => {
   Exercises.find({ id: req.query.userId }, (err, data) => {
     if (err) res.json({ error: err });
-    res.send(data);
+    res.send(
+      data.map(item => {
+        
+      })
+    );
   });
 });
 // Not found middleware
