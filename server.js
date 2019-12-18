@@ -72,9 +72,7 @@ app.route("/api/exercise/add").post((req, res) => {
         id: user._id.toString(),
         description: req.body.description,
         duration: req.body.duration,
-        date: req.body.date
-          ? new Date(req.body.date)
-          : new Date()
+        date: req.body.date ? new Date(req.body.date) : new Date()
       });
       newExercise.save((err, data) => {
         if (err) res.json({ error: err });
@@ -129,17 +127,26 @@ app.route("/api/exercise/users").get((req, res) => {
 });
 
 app.get("/api/exercise/log", (req, res) => {
-  Exercises.find({ id: req.query.userId }, (err, data) => {
-    if (err) res.json({ error: err });
-    res.json({
-      user_name: data[0].user_name,
-      id: data[0].id,
-      count: data.length,
-      log: data.map(item => {
-            return  {description: item.description, duration: item.duration, date: item.date};
+  Exercises.find({
+    id: req.query.userId,
+    date: { $gte: new Date(req.query.from), $lte: new Date(req.query.to) }
+  })
+    .limit(req.query.limit)
+    .exec((err, data) => {
+      if (!req.query.userId) res.json({ error: err });
+      res.json({
+        user_name: data[0].user_name,
+        id: data[0].id,
+        count: data.length,
+        log: data.map(item => {
+          return {
+            description: item.description,
+            duration: item.duration,
+            date: item.date
+          };
         })
+      });
     });
-  });
 });
 // Not found middleware
 app.use((req, res, next) => {
