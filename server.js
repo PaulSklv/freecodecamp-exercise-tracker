@@ -70,7 +70,7 @@ app.route("/api/exercise/add").post((req, res) => {
         })
         newExercise.save((err, data) => {
           if(err) res.json({error: err});
-          res.send(data);
+          res.json({...user});
         })
       } else {
         exercise.count = exercise.log.length + 1;
