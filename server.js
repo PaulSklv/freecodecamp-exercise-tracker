@@ -1,37 +1,39 @@
-const express = require('express')
-const app = express()
-const bodyParser = require('body-parser')
+const express = require("express");
+const app = express();
+const bodyParser = require("body-parser");
 
-const cors = require('cors')
+const cors = require("cors");
 
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
-})
+});
 
-app.use(cors())
+app.use(cors());
 
-app.use(bodyParser.urlencoded({extended: false}))
-app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-
-app.use(express.static('public'))
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/views/index.html')
+app.use(express.static("public"));
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/views/index.html");
 });
 
 const Schema = mongoose.Schema;
-const usersSchema = new Schema({
-  user_name: {
-    type: String,
-    requiered: true
+const usersSchema = new Schema(
+  {
+    user_name: {
+      type: String,
+      requiered: true
+    },
+    description: String,
+    duration: Number,
+    date: String
   },
-  description: String,
-  duration: Number,
-  date: String
-}, {versionKey: false});
+  { versionKey: false }
+);
 
 // const exerciseSchema = new Schema({
 //   user_name: {
@@ -48,38 +50,40 @@ const exerciseSchema = new Schema({
   description: String,
   duration: Number,
   date: String
-})
+});
 
-let Users = mongoose.model("Users", usersSchema); 
+let Users = mongoose.model("Users", usersSchema);
 let Exercises = mongoose.model("Exercises", exerciseSchema);
 
 app.route("/api/exercise/new-user").post((req, res, next) => {
-  let newUser = new Users({user_name: req.body.username})
+  let newUser = new Users({ user_name: req.body.username });
   newUser.save((err, data) => {
-    if(err) res.send("there is error");
+    if (err) res.send("there is error");
     res.json(data);
-  })
-})
-
+  });
+});
 
 app.route("/api/exercise/add").post((req, res) => {
   Users.findById(req.body.userId).exec((err, user) => {
-    if(err) res.json({error: err});
-    if(user) {
+    if (err) res.json({ error: err });
+    if (user) {
       let newExercise = new Exercises({
         user_name: user.user_name,
         id: user._id.toString(),
         description: req.body.description,
         duration: req.body.duration,
-        date: req.body.date ? new Date().toDateString(req.body.date): new Date().toDateString()
-      })
+        date: req.body.date
+          ? new Date().toDateString(req.body.date)
+          : new Date().toDateString()
+      });
       newExercise.save((err, data) => {
-        if(err) res.json({error: err});
-        res.send(data);
-      })
+        if (err) res.json({ error: err });
+        const { _id, ...b } = data;
+        res.send(b);
+      });
     } else res.send("User doesn't exist in database.");
-  })
-})
+  });
+});
 
 // app.route("/api/exercise/add").post((req, res) => {
 //   Users.findById(req.body.userId, (err, user) => {
@@ -113,49 +117,49 @@ app.route("/api/exercise/add").post((req, res) => {
 //           res.send(data);
 //         })
 //       }
-//     }) 
+//     })
 //   })
 // })
 
 app.route("/api/exercise/users").get((req, res) => {
   Users.find({}, (err, data) => {
-    if(err) res.json({error: err})
+    if (err) res.json({ error: err });
     res.send(data);
-  })  
-})
+  });
+});
 
 app.get("/api/exercise/log", (req, res) => {
-  Exercises.find({id: req.query.userId}, (err, data) => {
-    if(err) res.json({error: err});
+  Exercises.find({ id: req.query.userId }, (err, data) => {
+    if (err) res.json({ error: err });
     res.send(data);
-  })
-})
+  });
+});
 // Not found middleware
 app.use((req, res, next) => {
-  return next({status: 404, message: 'not found'})
-})
+  return next({ status: 404, message: "not found" });
+});
 
 // Error Handling middleware
 app.use((err, req, res, next) => {
-  let errCode, errMessage
+  let errCode, errMessage;
 
   if (err.errors) {
     // mongoose validation error
-    errCode = 400 // bad request
-    const keys = Object.keys(err.errors)
+    errCode = 400; // bad request
+    const keys = Object.keys(err.errors);
     // report the first validation error
-    errMessage = err.errors[keys[0]].message
+    errMessage = err.errors[keys[0]].message;
   } else {
     // generic or custom error
-    errCode = err.status || 500
-    errMessage = err.message || 'Internal Server Error'
+    errCode = err.status || 500;
+    errMessage = err.message || "Internal Server Error";
   }
-  res.status(errCode).type('txt')
-    .send(errMessage)
-})
-
-
+  res
+    .status(errCode)
+    .type("txt")
+    .send(errMessage);
+});
 
 const listener = app.listen(process.env.PORT || 3000, () => {
-  console.log('Your app is listening on port ' + listener.address().port)
-})
+  console.log("Your app is listening on port " + listener.address().port);
+});
